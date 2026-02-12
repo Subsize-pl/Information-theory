@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Лабораторная №1 ТИ</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🔐 Лабораторная №1</h1>
+        <p class="subtitle">
+          Шифрование и дешифрование текстов на русском языке
+        </p>
+      </header>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="rail-fence">
+          <span class="tab-icon">🚂</span>
+          Железнодорожная изгородь
+        </button>
+        <button class="tab" data-tab="vigenere">
+          <span class="tab-icon">🔑</span>
+          Шифр Виженера
+        </button>
+      </div>
+
+      <!-- Rail Fence Cipher -->
+      <div class="tab-content active" id="rail-fence">
+        <div class="info-card">
+          <h3>Метод "Железнодорожная изгородь"</h3>
+          <p>
+            Символы записываются зигзагом, затем читаются построчно.
+            Поддерживаются только русские буквы.
+          </p>
+        </div>
+
+        <div class="cipher-section">
+          <div class="input-area">
+            <label for="railText">
+              <span>Исходный текст</span>
+              <span class="char-count" id="railCharCount">0 / 4096</span>
+            </label>
+            <div class="input-with-file">
+              <textarea
+                id="railText"
+                placeholder="Введите текст для шифрования (только русские буквы)..."
+                maxlength="4096"
+              ></textarea>
+              <button
+                class="file-btn"
+                onclick="loadFile('railText')"
+                title="Загрузить из файла"
+              >
+                📁
+              </button>
+              <input
+                type="file"
+                id="railFileInput"
+                accept=".txt"
+                style="display: none"
+              />
+            </div>
+          </div>
+
+          <div class="key-area">
+            <label for="railKey">
+              <span>Ключ (высота изгороди)</span>
+              <span class="hint">от 2 до 10</span>
+            </label>
+            <input
+              type="number"
+              id="railKey"
+              value="4"
+              min="2"
+              max="10"
+              placeholder="Введите высоту"
+            />
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="handleEncryptRail()">
+              <span>🔒</span> Зашифровать
+            </button>
+            <button class="btn btn-secondary" onclick="handleDecryptRail()">
+              <span>🔓</span> Расшифровать
+            </button>
+            <button class="btn btn-success" onclick="saveResult('railResult')">
+              <span>💾</span> Сохранить результат
+            </button>
+          </div>
+
+          <div class="result-area">
+            <label>
+              <span>Результат</span>
+            </label>
+            <div class="result-box" id="railResult"></div>
+          </div>
+
+          <div class="visualization" id="railVisualization"></div>
+        </div>
+      </div>
+
+      <!-- Vigenere Cipher -->
+      <div class="tab-content" id="vigenere">
+        <div class="info-card">
+          <h3>Шифр Виженера (прогрессивный ключ)</h3>
+          <p>
+            Многоалфавитный шифр подстановки с прогрессивным ключом. При
+            повторном использовании ключ сдвигается на одну позицию в алфавите.
+          </p>
+        </div>
+
+        <div class="cipher-section">
+          <div class="input-area">
+            <label for="vigText">
+              <span>Исходный текст</span>
+              <span class="char-count" id="vigCharCount">0 / 4096</span>
+            </label>
+            <div class="input-with-file">
+              <textarea
+                id="vigText"
+                placeholder="Введите текст для шифрования (только русские буквы)..."
+                maxlength="4096"
+              ></textarea>
+              <button
+                class="file-btn"
+                onclick="loadFile('vigText')"
+                title="Загрузить из файла"
+              >
+                📁
+              </button>
+              <input
+                type="file"
+                id="vigFileInput"
+                accept=".txt"
+                style="display: none"
+              />
+            </div>
+          </div>
+
+          <div class="key-area">
+            <label for="vigKey">
+              <span>Ключевое слово</span>
+              <span class="hint"
+                >только русские буквы, от 3 до 20 символов</span
+              >
+            </label>
+            <input
+              type="text"
+              id="vigKey"
+              value="КЛЮЧ"
+              placeholder="Введите ключевое слово"
+              maxlength="20"
+            />
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="handleEncryptVigenere()">
+              <span>🔒</span> Зашифровать
+            </button>
+            <button class="btn btn-secondary" onclick="handleDecryptVigenere()">
+              <span>🔓</span> Расшифровать
+            </button>
+            <button class="btn btn-success" onclick="saveResult('vigResult')">
+              <span>💾</span> Сохранить результат
+            </button>
+          </div>
+
+          <div class="result-area">
+            <label>
+              <span>Результат</span>
+            </label>
+            <div class="result-box" id="vigResult"></div>
+          </div>
+
+          <div class="visualization" id="vigVisualization"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal" id="errorModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-icon">⚠️</span>
+          <h3>Ошибка</h3>
+        </div>
+        <div class="modal-body" id="errorMessage"></div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="closeModal()">
+            Понятно
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div><strong>Разработал:</strong> студент группы 451003, БГУИР</div>
+      <div>
+        Лабораторная работа №1 — <em>«Простейшие методы шифрования»</em>
+      </div>
+      <div>Дисциплина: Теория информации (ТИ)</div>
+      <div class="footer-year">© 2026</div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="ciphers/rail_fence.js"></script>
+    <script src="ciphers/vigenere.js"></script>
+  </body>
+</html>
