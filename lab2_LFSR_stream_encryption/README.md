@@ -2,12 +2,12 @@
 
 Laboratory Work No. 2  
 Information Theory  
-Variant 26
+Variant 4
 
 ## Description
 
 This project is a graphical application for stream encryption and decryption of files with any content and any extension.  
-The program implements a keystream generator based on a Linear Feedback Shift Register (LFSR) with the characteristic polynomial assigned to Variant 26.
+The program implements a keystream generator based on a Linear Feedback Shift Register (LFSR) with the characteristic polynomial assigned to Variant 4.
 
 The encryption is performed bitwise: each byte of the file is XORed with a corresponding byte of the keystream produced by the LFSR.  
 Since XOR is its own inverse, the same operation is used for both encryption and decryption.
