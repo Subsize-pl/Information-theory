@@ -6,7 +6,7 @@ Variant 26
 
 ## Description
 
-This project is a graphical (non-console) application for stream encryption and decryption of files with any content and any extension.  
+This project is a graphical application for stream encryption and decryption of files with any content and any extension.  
 The program implements a keystream generator based on a Linear Feedback Shift Register (LFSR) with the characteristic polynomial assigned to Variant 26.
 
 The encryption is performed bitwise: each byte of the file is XORed with a corresponding byte of the keystream produced by the LFSR.  
@@ -77,17 +77,17 @@ The total size of each stream is shown alongside its label.
 
 ## LFSR Table Generator
 
-The repository also includes a Python script `generate_lfsr.py` that produces an `.xlsx` spreadsheet visualizing the step-by-step operation of the LFSR.
+The repository also includes a Python script `generator.py` that produces an `.xlsx` spreadsheet visualizing the step-by-step operation of the LFSR.
 
 ```bash
-python generate_lfsr.py [initial_state] [steps]
+python generator.py [initial_state] [steps]
 ```
 
 Examples:
 
 ```bash
-python generate_lfsr.py 11111111111111111111111111 85
-python generate_lfsr.py 10110100011001011101001001 50
+python generator.py 11111111111111111111111111 85
+python generator.py 10110100011001011101001001 50
 ```
 
 The spreadsheet contains:
@@ -99,21 +99,6 @@ The spreadsheet contains:
 - All shifts and feedback values are formula-driven, not hardcoded
 
 Requires: `pip install openpyxl`
-
-## Project Structure
-
-```
-lab2/
-├── index.html
-├── css/
-│   ├── base.css        # Variables, reset, keyframes
-│   ├── layout.css      # Container, header, info card, footer
-│   └── components.css  # All interactive UI components
-└── js/
-    ├── lfsr.js         # LFSR class and register constants
-    ├── ui.js           # Formatting helpers, binary display, progress bar, modal
-    └── app.js          # Application state, file handling, encrypt/decrypt, save
-```
 
 ## Technologies
 
