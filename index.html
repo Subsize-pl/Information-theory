@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Лабораторная №2 ТИ</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <h1>🔐 Лабораторная №2</h1>
+        <p class="subtitle">Потоковое шифрование</p>
+      </header>
+
+      <div class="info-card">
+        <h3>Cдвиговый регистр с линейной обратной связью (LFSR)</h3>
+        <p>
+          Каждый бит шифротекста получается операцией XOR исходного бита и бита
+          ключевого потока:
+          <code>C<sub>i</sub> = M<sub>i</sub> XOR K<sub>i</sub></code
+          >. Ключевой поток генерируется регистром LFSR, структура которого
+          задана характеристическим многочленом размерности m = 26:
+          <code>P(x) = x²⁶ + x⁸ + x⁷ + x + 1</code>.<br />
+          Операция симметрична: одна и та же процедура шифрует и расшифровывает
+          файл.
+        </p>
+      </div>
+
+      <div class="cipher-section">
+        <div class="input-area">
+          <label>
+            <span>Начальное состояние регистра</span>
+            <span class="hint">ровно 26 бит (0 или 1)</span>
+          </label>
+          <div class="seed-wrapper">
+            <input
+              type="text"
+              id="seedInput"
+              maxlength="26"
+              placeholder="00000000000000000000000001"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <span class="seed-counter" id="seedCounter">0 / 26</span>
+          </div>
+        </div>
+
+        <div class="input-area">
+          <label>
+            <span>Файл для обработки</span>
+            <span class="hint">любой формат</span>
+          </label>
+          <div class="file-drop-zone" id="dropZone">
+            <input type="file" id="fileInput" />
+            <div id="dropPrompt">
+              <div class="drop-icon">📂</div>
+              <div class="drop-text">
+                <strong>Нажмите или перетащите файл</strong> сюда
+              </div>
+            </div>
+            <div class="file-info" id="fileInfo">
+              <div class="file-info-icon">📄</div>
+              <div>
+                <div class="file-name" id="fileName"></div>
+                <div class="file-size" id="fileSize"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button
+            class="btn btn-primary"
+            id="processBtn"
+            onclick="processFile()"
+          >
+            <span>⚙️</span> Зашифровать / Расшифровать
+          </button>
+          <button
+            class="btn btn-success"
+            id="saveBtn"
+            onclick="saveResult()"
+            style="display: none"
+          >
+            <span>💾</span> Сохранить результат
+          </button>
+        </div>
+
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-label" id="progressLabel">0%</div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+          <hr class="results-divider" />
+
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-value" id="statBytes">—</div>
+              <div class="stat-label">Байт обработано</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value" id="statBits">—</div>
+              <div class="stat-label">Бит ключа использовано</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">2²⁶−1</div>
+              <div class="stat-label">
+                Период генератора<br />(67&nbsp;108&nbsp;863)
+              </div>
+            </div>
+          </div>
+
+          <div class="result-cards">
+            <div class="result-card">
+              <div class="result-card-header">
+                <span class="result-card-icon">📄</span>
+                <span class="result-card-title">Исходный файл</span>
+              </div>
+              <div class="binary-display" id="origDisplay"></div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-card-header">
+                <span class="result-card-icon">🔑</span>
+                <span class="result-card-title">Ключевой поток</span>
+              </div>
+              <div class="binary-display" id="keyDisplay"></div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-card-header">
+                <span class="result-card-icon">🔒</span>
+                <span class="result-card-title">Результат</span>
+              </div>
+              <div class="binary-display" id="resDisplay"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="errorModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-icon">⚠️</span>
+          <h3>Ошибка</h3>
+        </div>
+        <div class="modal-body" id="errorMessage"></div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="closeModal()">
+            Понятно
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div><strong>Разработал:</strong> студент группы 451003, БГУИР</div>
+      <div>Лабораторная работа №2 — <em>«Потоковое шифрование LFSR»</em></div>
+      <div>Дисциплина: Теория информации (ТИ)</div>
+      <div class="footer-year">© 2026</div>
+    </footer>
+
+    <script src="js/lfsr.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
