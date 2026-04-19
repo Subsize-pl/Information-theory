@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Лабораторная №3 ТИ</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <h1>🔐 Лабораторная №3</h1>
+        <p class="subtitle">Криптосистема Рабина</p>
+      </header>
+
+      <div class="info-card">
+        <h3>Криптосистема Рабина</h3>
+        <p>
+          Каждый байт файла <code>m ∈ [0, 255]</code> шифруется формулой
+          <code>c = m * (m + b) mod n</code>, где <code>n = p * q</code>.
+          Зашифрованные значения могут превышать 255, поэтому файл сохраняется
+          как текст из чисел в десятичной СС, разделенных пробелами.
+        </p>
+        <p>
+          Дешифрование сводится к нахождению квадратного корня дискриминанта
+          <code>D = b * b + 4c</code> по модулю составного числа n через
+          китайскую теорему об остатках. Из 4 полученных корней выбирается
+          единсвенный, дающий байт в диапазоне <code>[0, 255]</code>.
+        </p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="encrypt">
+          <span class="tab-icon">🔒</span> Шифрование
+        </button>
+        <button class="tab" data-tab="decrypt">
+          <span class="tab-icon">🔓</span> Дешифрование
+        </button>
+      </div>
+
+      <div class="tab-content active" id="encrypt">
+        <div class="cipher-section">
+          <div class="params-card">
+            <div class="params-grid">
+              <div class="param-group">
+                <label>
+                  <span>p</span>
+                  <span class="hint">простое, = 3 mod 4</span>
+                </label>
+                <input
+                  type="text"
+                  id="enc-p"
+                  placeholder="19"
+                  autocomplete="off"
+                />
+                <span class="param-hint" id="enc-p-hint"></span>
+              </div>
+
+              <div class="param-group">
+                <label>
+                  <span>q</span>
+                  <span class="hint">простое, = 3 mod 4, != p</span>
+                </label>
+                <input
+                  type="text"
+                  id="enc-q"
+                  placeholder="23"
+                  autocomplete="off"
+                />
+                <span class="param-hint" id="enc-q-hint"></span>
+              </div>
+
+              <div class="param-group">
+                <label>
+                  <span>b</span>
+                  <span class="hint">0 &lt; b &lt; n</span>
+                </label>
+                <input
+                  type="text"
+                  id="enc-b"
+                  placeholder="173"
+                  autocomplete="off"
+                />
+                <span class="param-hint" id="enc-b-hint"></span>
+              </div>
+            </div>
+            <div class="n-display" id="enc-n">n = p * q = ...</div>
+          </div>
+
+          <div class="input-area">
+            <label>
+              <span>Файл для шифрования</span>
+              <span class="hint">любой формат</span>
+            </label>
+            <div class="file-drop-zone" id="enc-dropZone">
+              <input type="file" id="enc-fileInput" />
+              <div id="enc-dropPrompt">
+                <div class="drop-icon">📂</div>
+                <div class="drop-text">
+                  <strong>Нажмите или перетащите файл</strong> сюда
+                </div>
+              </div>
+              <div class="file-info" id="enc-fileInfo">
+                <div class="file-info-icon">📄</div>
+                <div>
+                  <div class="file-name" id="enc-fileName"></div>
+                  <div class="file-size" id="enc-fileSize"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="btn btn-primary"
+              id="enc-processBtn"
+              onclick="processEncrypt()"
+            >
+              <span>🔒</span> Зашифровать
+            </button>
+            <button
+              class="btn btn-success"
+              id="enc-saveBtn"
+              onclick="saveEncrypted()"
+              style="display: none"
+            >
+              <span>💾</span> Сохранить результат
+            </button>
+          </div>
+
+          <div class="progress-wrap" id="enc-progressWrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="enc-progressFill"></div>
+            </div>
+            <div class="progress-label" id="enc-progressLabel">0%</div>
+          </div>
+
+          <div class="results-section" id="enc-resultsSection">
+            <hr class="results-divider" />
+
+            <div class="stats-row">
+              <div class="stat-box">
+                <div class="stat-value" id="enc-statBytes">...</div>
+                <div class="stat-label">Байт зашифровано</div>
+              </div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-card-header">
+                <span class="result-card-title">Зашифрованные значения</span>
+              </div>
+              <div class="decimal-display" id="enc-display"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="decrypt">
+        <div class="cipher-section">
+          <div class="params-card">
+            <div class="params-grid">
+              <div class="param-group">
+                <label>
+                  <span>p</span>
+                  <span class="hint">простое, = 3 mod 4</span>
+                </label>
+                <input
+                  type="text"
+                  id="dec-p"
+                  placeholder="19"
+                  autocomplete="off"
+                />
+                <span class="param-hint" id="dec-p-hint"></span>
+              </div>
+
+              <div class="param-group">
+                <label>
+                  <span>q</span>
+                  <span class="hint">простое, = 3 mod 4, != p</span>
+                </label>
+                <input
+                  type="text"
+                  id="dec-q"
+                  placeholder="23"
+                  autocomplete="off"
+                />
+                <span class="param-hint" id="dec-q-hint"></span>
+              </div>
+
+              <div class="param-group">
+                <label>
+                  <span>b</span>
+                  <span class="hint">0 &lt; b &lt; n</span>
+                </label>
+                <input
+                  type="text"
+                  id="dec-b"
+                  placeholder="173"
+                  autocomplete="off"
+                />
+                <span class="param-hint" id="dec-b-hint"></span>
+              </div>
+            </div>
+            <div class="n-display" id="dec-n">n = p * q = ...</div>
+          </div>
+
+          <div class="input-area">
+            <label>
+              <span>Зашифрованный файл</span>
+              <span class="hint">текстовый файл с числами (.txt)</span>
+            </label>
+            <div class="file-drop-zone" id="dec-dropZone">
+              <input type="file" id="dec-fileInput" accept=".txt" />
+              <div id="dec-dropPrompt">
+                <div class="drop-icon">📂</div>
+                <div class="drop-text">
+                  <strong>Нажмите или перетащите файл</strong> сюда
+                </div>
+              </div>
+              <div class="file-info" id="dec-fileInfo">
+                <div class="file-info-icon">📄</div>
+                <div>
+                  <div class="file-name" id="dec-fileName"></div>
+                  <div class="file-size" id="dec-fileSize"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="btn btn-primary"
+              id="dec-processBtn"
+              onclick="processDecrypt()"
+            >
+              <span>🔓</span> Расшифровать
+            </button>
+            <button
+              class="btn btn-success"
+              id="dec-saveBtn"
+              onclick="saveDecrypted()"
+              style="display: none"
+            >
+              <span>💾</span> Сохранить результат
+            </button>
+          </div>
+
+          <div class="progress-wrap" id="dec-progressWrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="dec-progressFill"></div>
+            </div>
+            <div class="progress-label" id="dec-progressLabel">0%</div>
+          </div>
+
+          <div class="results-section" id="dec-resultsSection">
+            <hr class="results-divider" />
+
+            <div class="stats-row">
+              <div class="stat-box">
+                <div class="stat-value" id="dec-statCount">...</div>
+                <div class="stat-label">Значений расшифровано</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="dec-statSize">...</div>
+                <div class="stat-label">Размер файла</div>
+              </div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-card-header">
+                <span class="result-card-title">Расшифрованные байты </span>
+              </div>
+              <div class="decimal-display" id="dec-display"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="errorModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-icon">⚠️</span>
+          <h3>Ошибка</h3>
+        </div>
+        <div class="modal-body" id="errorMessage"></div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="closeModal()">
+            Понятно
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div><strong>Разработал:</strong> студент группы 451003, БГУИР</div>
+      <div>Лабораторная работа №3 — <em>«Криптосистема Рабина»</em></div>
+      <div>Дисциплина: Теория информации (ТИ)</div>
+      <div class="footer-year">© 2026</div>
+    </footer>
+
+    <script src="js/rabin.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
